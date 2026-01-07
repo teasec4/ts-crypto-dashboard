@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useCoinStore } from "../../../shared/store/coinStore";
 
 export function useCoin() {
@@ -7,9 +7,13 @@ export function useCoin() {
   const error = useCoinStore((state) => state.error);
   const fetchCoins = useCoinStore((state) => state.fetchCoins);
 
-  useEffect(() => {
+  const memoizedFetch = useCallback(() => {
     fetchCoins();
-  }, []);
+  }, [fetchCoins]);
+
+  useEffect(() => {
+    memoizedFetch();
+  }, [memoizedFetch]);
 
   return { coins, loading, error, refetch: fetchCoins };
 }
