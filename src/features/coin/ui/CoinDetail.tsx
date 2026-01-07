@@ -34,18 +34,30 @@ function CoinDetail({ coinId }: CoinDetailProps) {
     const fetchCoinDetail = async () => {
       setLoading(true)
       setError(null)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
       try {
         const response = await fetch(
-          `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false`
+          `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false`,
+          { signal: controller.signal }
         )
+        clearTimeout(timeoutId)
+        
         if (!response.ok) throw new Error("Failed to fetch coin details")
         const data = await response.json()
         if (isMounted) {
           setCoin(data)
         }
       } catch (err) {
+        clearTimeout(timeoutId)
         if (isMounted) {
-          setError(err instanceof Error ? err.message : "Unknown error")
+          if (err instanceof Error && err.name === "AbortError") {
+            setError("Request timeout - took too long to fetch data")
+          } else {
+            setError(err instanceof Error ? err.message : "Unknown error")
+          }
           console.error("Fetch error:", err)
         }
       } finally {
@@ -102,9 +114,9 @@ function CoinDetail({ coinId }: CoinDetailProps) {
   const isPositive = priceChange >= 0
 
   return (
-    <div className={`flex flex-col h-screen ${theme.bg.primary}`}>
+    <div className={`flex flex-col h-full`}>
       {/* Header */}
-      <header className={`${theme.header.bg} ${theme.header.text} p-4 shadow-lg`}>
+      <header className={`${theme.header.bg} ${theme.header.text} p-4 shadow-lg hidden md:block`}>
         <button
           onClick={() => navigate("/")}
           className="text-xl hover:opacity-80 transition"
@@ -114,8 +126,8 @@ function CoinDetail({ coinId }: CoinDetailProps) {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="w-full max-w-sm mx-auto">
+      <div className="flex-1 overflow-y-auto p-4 pt-16 md:pt-4">
+        <div className="w-full max-w-sm mx-auto md:max-w-2xl">
           {/* Coin Header */}
           <div className={`${theme.card.bg} ${theme.card.border} border rounded-xl ${theme.card.shadow} p-6 mb-4`}>
             <div className="flex items-center gap-4 mb-4">

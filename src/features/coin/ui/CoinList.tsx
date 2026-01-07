@@ -16,15 +16,15 @@ function CoinList() {
   }, [error]);
 
   return (
-    <div className={`flex flex-col h-screen ${theme.bg.primary}`}>
+    <div className={`flex flex-col h-full`}>
       {/* Header */}
-      <div className={`${theme.header.bg} ${theme.header.text} p-4 shadow-lg`}>
+      <div className={`${theme.header.bg} ${theme.header.text} p-4 shadow-lg hidden md:block`}>
         <h1 className="text-2xl font-bold">Crypto</h1>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-3">
-        <div className="w-full max-w-sm mx-auto">
+      <div className="flex-1 overflow-y-auto p-3 md:p-4 pt-16 md:pt-3">
+        <div className="w-full max-w-sm mx-auto md:max-w-2xl">
           {error && showError && (
             <div className={`p-4 ${theme.error.bg} border ${theme.error.border} ${theme.error.text} rounded-lg mb-6 flex items-center justify-between`}>
               <span>⚠️ {error}</span>
